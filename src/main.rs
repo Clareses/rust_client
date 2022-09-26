@@ -89,18 +89,17 @@ fn visit_folder(
 
     // visit all files in this folder
     let regex =
-        Regex::new(" href=\"(.{0,}preview.*lid=18730.*)\" target.* title=\".*\n?\">?(.*)</a>");
+        Regex::new(" href=\"(.*preview.*lid=18730.*)\".*target.*\n?.*title=\".*\n?\">?(.*)</a>");
+
     for cap in regex.unwrap().captures_iter(content.as_str()) {
-        match recorder.contains(&cap[2]) {
-            true => {
-                format_print(&cap[2], depth + 1, "old_file");
-            }
+        match recorder.contains(&cap[1]) {
+            true => format_print(&cap[2], depth + 1, "old_file"),
             false => {
                 format_print(&cap[2], depth + 1, "new_file");
                 let mut path = String::from("http://met2.fzu.edu.cn/meol/common/script/");
                 path.push_str(&cap[1]);
                 client.get(path.as_str()).send().unwrap();
-                recorder.insert(String::from(&cap[2]));
+                recorder.insert(String::from(&cap[1]));
             }
         }
     }
@@ -119,7 +118,10 @@ fn main() {
     let fd = File::open("./.recorder.txt");
     let recorder = match fd {
         Ok(f) => f,
-        Err(_e) => File::create("./.recorder.txt").unwrap(),
+        Err(_e) => {
+            File::create("./.recorder.txt").unwrap();
+            File::open("./.recorder.txt").unwrap()
+        }
     };
 
     // read the config file
