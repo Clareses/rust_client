@@ -57,7 +57,7 @@ fn format_print(content: &str, depth: usize, format: &str) {
     }
 
     if format == "new_file" {
-        println!("FIND NEW FILE : {}", content);
+        println!("\x1b[1;42;30mFIND NEW FILE : {}\x1b[40;37m", content);
     } else if format == "enter_folder" {
         println!("Enter into Folder: {}", content);
     } else if format == "exit_folder" {
@@ -158,6 +158,11 @@ fn main() {
         0,
         &mut tree,
     );
+
+    client
+        .get("http://met2.fzu.edu.cn/meol/homepage/common/logout.jsp")
+        .send()
+        .unwrap();
 
     let recorder = File::create("./.recorder.txt").unwrap();
     update_recorder(recorder, tree);
